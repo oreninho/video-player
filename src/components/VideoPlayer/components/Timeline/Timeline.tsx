@@ -20,6 +20,7 @@ export const Timeline: React.FC = () => {
         seek(pct * duration);
     };
 
+    const progressPrecent = (currentTime / duration) * 100;
     return (
         <div className="timeline" ref={barRef} onClick={handleClick}>
             <div className="thumbnails">
@@ -31,8 +32,7 @@ export const Timeline: React.FC = () => {
                     />
                 ))}
             </div>
-            <div className="progress" style={{ width: `${(currentTime / duration) * 100}%` }}>
-                <div className={'progress-handle'} style={{ left: `${(currentTime / duration) * 100}%` }} />
+            <div className="progress" style={{ width: `${progressPrecent}%` }}>
             </div>
         </div>
     );

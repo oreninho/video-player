@@ -14,7 +14,7 @@ export interface VideoContextType {
     togglePlay: () => void;
     seek: (time: number) => void;
     toggleMute: () => void;
-    setTrimRange: (start: number, end: number) => void;
+    setTrimRange: (start?: number, end?: number) => void;
     handleLoadedMetadata: (e: React.SyntheticEvent<HTMLVideoElement>) => void;
     handleTimeUpdate: (e: React.SyntheticEvent<HTMLVideoElement>) => void;
 }

@@ -21,8 +21,8 @@ const VideoProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
     const  { muted, toggleMute } = useVolumeControls(videoRef);
     const { duration, currentTime, handleLoadedMetadata, handleTimeUpdate, setCurrentTime } = useVideoMetadata();
-    const { play, pause, isPlaying, togglePlay, seek } = useVideoControls(videoRef, setCurrentTime);
-    const {trimStart, trimEnd, setTrimRange }  = useVideoTrimRange(videoRef, duration, setCurrentTime);
+    const { play, pause, isPlaying, setIsPlaying, togglePlay, seek } = useVideoControls(videoRef, setCurrentTime);
+    const {trimStart, trimEnd, setTrimRange }  = useVideoTrimRange(videoRef, duration, setCurrentTime, setIsPlaying);
 
 
 

@@ -27,5 +27,5 @@ export function useVideoControls(videoRef: React.RefObject<HTMLVideoElement>,set
         setCurrentTime(t);
     },[videoRef, setCurrentTime, isPlaying]);
 
-    return { isPlaying, play, pause, togglePlay,seek };
+    return { isPlaying,setIsPlaying, play, pause, togglePlay,seek };
 }
