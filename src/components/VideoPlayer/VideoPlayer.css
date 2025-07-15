@@ -1,0 +1,70 @@
+.video-player {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    background-color: #1a1a1a;
+    border-radius: 10px;
+}
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.time{
+    font-size: 12px;
+}
+.icon {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+.video-element {
+    width: 100%;
+}
+
+.timeline {
+    position: relative;
+    height: 8px;
+    background: #ddd;
+    cursor: pointer;
+    margin-top: 12px;
+}
+
+.progress {
+    position: absolute;
+    height: 100%;
+    background: #2196f3;
+}
+
+.trim-range {
+    position: absolute;
+    height: 100%;
+    background: rgba(33, 150, 243, 0.3);
+}
+
+.handle {
+    position: absolute;
+    top: -4px;
+    width: 8px;
+    height: 16px;
+    cursor: ew-resize;
+    background: #2196f3;
+}
+
+.handle.start {
+    left: 0;
+}
+
+.handle.end {
+    right: 0;
+}
+
+button {
+    background-color: transparent;
+    border: none;
+    color: darkgray;
+    cursor: pointer;
+}
