@@ -1,0 +1,29 @@
+.trim-range {
+    top: 0;
+    position: absolute;
+    height: 100%;
+    background: rgba(33, 150, 243, 0.2);
+    border-top: 2px solid yellow;
+    border-bottom: 2px solid yellow;
+
+}
+
+.handle {
+    position: absolute;
+    top: 0;
+    width: 6px;
+    height: 100%;
+    cursor: ew-resize;
+    background: yellow;
+    border-radius: 1px;
+    transition: background 0.3s ease;
+    z-index: 1;
+}
+
+.handle.start {
+    left: 0;
+}
+
+.handle.end {
+    right: 0;
+}

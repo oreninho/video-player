@@ -1,150 +1,116 @@
-import React, { useRef, useState } from 'react';
-import { Play } from '../../icons/Play';
-import { Pause } from '../../icons/Pause';
-import { Volume } from '../../icons/Volume';
-import { Mute } from '../../icons/Mute';
+import React, {useRef, useContext, ReactNode, FC} from 'react';
 import './VideoPlayer.css';
 
-interface VideoPlayerProps {
+import { PlayIcon }   from '../../icons/PlayIcon';
+import { PauseIcon }  from '../../icons/PauseIcon';
+import { VolumeIcon } from '../../icons/VolumeIcon';
+import { MuteIcon }   from '../../icons/MuteIcon';
+
+import { Timeline }   from './components/Timeline/Timeline';
+import { TrimBar }    from './components/TrimBar/TrimBar';
+import {VideoContext } from './VideoContext';
+import {useVideoMetadata} from "./hooks/useVideoMetaData";
+import {useVideoControls} from "./hooks/useVideoControls";
+import {useVideoTrimRange} from "./hooks/useVideoTrimRange.ts";
+import {useVolumeControls} from "./hooks/useVideoVolumeControls.ts";
+
+const VideoProvider: FC<{ children: ReactNode }> = ({ children }) => {
+    const videoRef = useRef<HTMLVideoElement|null>(null);
+
+
+
+    const  { muted, toggleMute } = useVolumeControls(videoRef);
+    const { duration, currentTime, handleLoadedMetadata, handleTimeUpdate, setCurrentTime } = useVideoMetadata();
+    const { play, pause, isPlaying, togglePlay, seek } = useVideoControls(videoRef, setCurrentTime);
+    const {trimStart, trimEnd, setTrimRange }  = useVideoTrimRange(videoRef, duration, setCurrentTime);
+
+
+
+    return (
+        <VideoContext.Provider value={{
+            videoRef,
+            duration,
+            currentTime,
+            isPlaying,
+            muted,
+            trimStart,
+            trimEnd,
+            play,
+            pause,
+            togglePlay,
+            seek,
+            toggleMute,
+            setTrimRange,
+            handleLoadedMetadata,
+            handleTimeUpdate
+        }}>
+            {children}
+        </VideoContext.Provider>
+    );
+};
+
+interface VideoLayoutProps {
     src: string;
     width?: string;
     height?: string;
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ src,width,height }) => {
-    const videoRef = useRef<HTMLVideoElement |null>(null);
-    const timelineRef = useRef<HTMLDivElement|null>(null);
+const VideoLayout: FC<VideoLayoutProps> = ({src, width = '600', height = '360'}) => {
 
-    const [duration, setDuration] = useState(0);
-    const [currentTime, setCurrentTime] = useState(0);
-    const [trimStart, setTrimStart] = useState(0);
-    const [trimEnd, setTrimEnd] = useState(0);
-    const [volume, setVolume] = useState(1);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [muted, setMuted] = useState(false);
-
-    const dragState = useRef<{ type: 'start' | 'end' | null; initialX: number; initialTime: number }>({
-        type: null,
-        initialX: 0,
-        initialTime: 0,
-    });
-
-    const handleLoadedMetadata = (e: React.SyntheticEvent<HTMLVideoElement>) => {
-        const video = e.currentTarget;
-        setDuration(video.duration);
-        setTrimEnd(video.duration);
-    };
-
-    const handleTimeUpdate = (e: React.SyntheticEvent<HTMLVideoElement>) => {
-        setCurrentTime(e.currentTarget.currentTime);
-    };
-
-    const seek = (time: number) => {
-        if (videoRef.current) {
-            videoRef.current.currentTime = time;
-        }
-    };
-
-    const handleTimelineClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        const rect = timelineRef.current?.getBoundingClientRect();
-        if (!rect) return;
-        const clickX = e.clientX - rect.left;
-        seek((clickX / rect.width) * duration);
-    };
-
-    const onHandlePointerDown = (e: React.PointerEvent, type: 'start' | 'end') => {
-        e.preventDefault();
-        if (!timelineRef.current) return;
-        dragState.current = { type, initialX: e.clientX, initialTime: type === 'start' ? trimStart : trimEnd };
-        document.addEventListener('pointermove', onPointerMove);
-        document.addEventListener('pointerup', onPointerUp);
-    };
-
-    const onPointerMove = (e: PointerEvent) => {
-        if (!timelineRef.current) return;
-        const { type, initialX, initialTime } = dragState.current;
-        if (!type) return;
-        const rect = timelineRef.current.getBoundingClientRect();
-        const deltaTime = ((e.clientX - initialX) / rect.width) * duration;
-        const newTime = initialTime + deltaTime;
-        if (type === 'start') setTrimStart(Math.max(0, Math.min(newTime, trimEnd)));
-        else setTrimEnd(Math.max(trimStart, Math.min(newTime, duration)));
-    };
-    const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const vol = parseFloat(e.target.value);
-        setVolume(vol);
-        if (videoRef.current) {
-            videoRef.current.volume = vol;
-        }
-        if (vol === 0) {
-            setMuted(true);
-        } else if (muted) {
-            setMuted(false);
-        }
-    };
-
-
-    const onPointerUp = () => {
-        dragState.current.type = null;
-        document.removeEventListener('pointermove', onPointerMove);
-        document.removeEventListener('pointerup', onPointerUp);
-    };
-
-    const togglePlay = () => {
-        if (videoRef.current) {
-            if (isPlaying) {
-                videoRef.current.pause();
-            } else {
-                videoRef.current.play();
-            }
-            setIsPlaying(!isPlaying);
-        }
-    }
+    const {
+        videoRef,
+        currentTime,
+        duration,
+        isPlaying,
+        muted,
+        togglePlay,
+        toggleMute,
+        handleLoadedMetadata,
+        handleTimeUpdate
+    } = useContext(VideoContext);
 
     return (
         <div className="video-player">
+            {/* raw video element */}
             <video
                 onClick={togglePlay}
-                width={width || "600"}
-                height={height || "360"}
-                muted={muted}
-                ref={videoRef}
+                ref={videoRef as React.RefObject<HTMLVideoElement>}
                 src={src}
-                className="video-element"
+                width={width}
+                height={height}
+                muted={muted}
                 onLoadedMetadata={handleLoadedMetadata}
                 onTimeUpdate={handleTimeUpdate}
+                className="video-element"
             />
             <div className="controls">
-                <button onClick={() => setMuted(!muted)} className="mute-button">
-                    {muted ? <Mute className={"icon"}/> : <Volume className={"icon"}/>}
+                <button onClick={toggleMute} className="control-button">
+                    {muted ? <MuteIcon   className="icon" /> : <VolumeIcon className="icon" />}
                 </button>
-                <input
-                    type="range"
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    value={muted ? 0 : volume}
-                    onChange={handleVolumeChange}
-                    className="volume-slider"
-                />
-                <button onClick={togglePlay}>{isPlaying?<Pause className={"icon"}/>:<Play className={"icon"}/>}</button>
-                <span className={"time"}>{currentTime.toFixed(2)} / {duration.toFixed(2)}</span>
 
+
+
+                <button onClick={togglePlay} className="control-button">
+                    {isPlaying ? <PauseIcon className="icon" /> : <PlayIcon  className="icon" />}
+                </button>
+
+                <span className="time">
+          {currentTime.toFixed(2)} / {duration.toFixed(2)}
+        </span>
             </div>
-            <div className="timeline" ref={timelineRef} onClick={handleTimelineClick}>
-                <div className="progress" style={{ width: `${(currentTime / duration) * 100}%` }} />
-                <div
-                    className="trim-range"
-                    style={{
-                        left: `${(trimStart / duration) * 100}%`,
-                        width: `${((trimEnd - trimStart) / duration) * 100}%`,
-                    }}
-                >
-                    <div className="handle start" onPointerDown={e => onHandlePointerDown(e, 'start')} />
-                    <div className="handle end" onPointerDown={e => onHandlePointerDown(e, 'end')} />
-                </div>
+            <div className="timebar-container">
+                <TrimBar />
+                <Timeline />
             </div>
         </div>
     );
 };
+
+
+export const VideoPlayer: FC<VideoLayoutProps> = props => (
+    <VideoProvider>
+        <VideoLayout {...props} />
+    </VideoProvider>
+);
+
 export default VideoPlayer;

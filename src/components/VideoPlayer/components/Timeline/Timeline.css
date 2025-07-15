@@ -1,0 +1,36 @@
+.timeline {
+    position: relative;
+    height: 50px;
+    background: #111;
+    cursor: pointer;
+    overflow: hidden;
+    user-select: none;
+}
+
+.thumbnails {
+    display: flex;
+    height: 100%;
+}
+
+.thumb {
+    flex: 0 0 100px;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+.progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: transparent;
+}
+.progress-handle {
+    position: absolute;
+    top: 0;
+    width: 1px;
+    height: 100%;
+    background: whitesmoke;
+    cursor: pointer;
+}
