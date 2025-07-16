@@ -17,8 +17,6 @@ import {useVolumeControls} from "./hooks/useVideoVolumeControls.ts";
 const VideoProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const videoRef = useRef<HTMLVideoElement|null>(null);
 
-
-
     const  { muted, toggleMute } = useVolumeControls(videoRef);
     const { duration, currentTime, handleLoadedMetadata, handleTimeUpdate, setCurrentTime } = useVideoMetadata();
     const { play, pause, isPlaying, setIsPlaying, togglePlay, seek } = useVideoControls(videoRef, setCurrentTime);
@@ -71,7 +69,6 @@ const VideoLayout: FC<VideoLayoutProps> = ({src, width = '600', height = '360'})
 
     return (
         <div className="video-player">
-            {/* raw video element */}
             <video
                 onClick={togglePlay}
                 ref={videoRef as React.RefObject<HTMLVideoElement>}

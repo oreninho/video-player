@@ -16,10 +16,11 @@ export function useVideoTrimRange(videoRef: React.RefObject<HTMLVideoElement>,du
 
     }, [duration]);
 
+
     useEffect(() => {
         const video = videoRef.current;
         if (!video) return;
-        const onTimeUpdate = () => {
+        const handleTrimEndEdge = () => {
             if (video.currentTime > trimEnd) {
                 video.pause();
                 setIsPlaying(false);
@@ -27,9 +28,9 @@ export function useVideoTrimRange(videoRef: React.RefObject<HTMLVideoElement>,du
                 setCurrentTime(trimEnd);
             }
         };
-        video.addEventListener('timeupdate', onTimeUpdate);
+        video.addEventListener('timeupdate', handleTrimEndEdge);
         return () => {
-            video.removeEventListener('timeupdate', onTimeUpdate);
+            video.removeEventListener('timeupdate', handleTrimEndEdge);
         };
     }, [trimEnd, videoRef, setCurrentTime]);
 

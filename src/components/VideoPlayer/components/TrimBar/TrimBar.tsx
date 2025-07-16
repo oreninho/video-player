@@ -1,7 +1,7 @@
 import React, {FC, useContext, useRef} from 'react';
-import './TrimBar.css'; // Assuming you have a CSS file for styling the TrimBar component
+import './TrimBar.css';
 import {VideoContext} from "../../videoContext.ts";
-import {useRangeDrag} from "../../hooks/useRangeDrag.ts"; // for .trim-range & .handle
+import {useRangeDrag} from "../../hooks/useRangeDrag.ts";
 
 
 
